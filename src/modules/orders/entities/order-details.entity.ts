@@ -3,7 +3,7 @@ import {
   Column,
   Entity,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Order } from './order.entity'
@@ -23,7 +23,7 @@ export class OrderDetails {
   @ManyToOne(() => Order, (order) => order.orderDetails)
   order: Order
 
-  @OneToOne(() => OrderProcess)
+  @OneToMany(() => OrderProcess, (orderDetails) => orderDetails.orderItem)
   orderProcessor: OrderProcess
   @ManyToOne(() => Product, (product) => product.orders)
   product: Product

@@ -159,6 +159,9 @@ export class OrdersService {
           customer: true,
           orderDetails: {
             product: true,
+            orderProcessor: {
+              agent: true,
+            },
           },
           delivery_site: {
             sector: {
@@ -180,6 +183,9 @@ export class OrdersService {
         relations: {
           orderDetails: {
             product: true,
+            orderProcessor: {
+              agent: true,
+            },
           },
           delivery_site: {
             sector: {
@@ -194,27 +200,50 @@ export class OrdersService {
 
     if (role === Role.AGENT) {
       // Find OrderProcess entities associated with the specified agent
-      const orderProcesses = await this.orderProcessRepository.find({
-        where: { agent: { id: userId } },
-        relations: ['orderItem', 'orderItem.order'],
+      // const orderProcesses = await this.orderProcessRepository.find({
+      //   where: { agent: { id: userId } },
+      //   relations: ['orderItem', 'orderItem.order'],
+      // })
+
+      // // Extract the order items from OrderProcess entities
+      // const orderItems = orderProcesses.map(
+      //   (orderProcess) => orderProcess.orderItem,
+      // )
+
+      // // Extract unique orders from the order items using a set to avoid duplicates
+      // const uniqueOrderIds = Array.from(
+      //   new Set(orderItems.map((orderItem) => orderItem.order.id)),
+      // )
+      // // Fetch additional details for the orders
+      // const detailedOrders = await this.orderRepository.find({
+      //   where: { id: In(uniqueOrderIds) },
+      //   relations: ['customer', 'delivery_site', 'orderDetails'],
+      // })
+
+      // return detailedOrders
+
+      return this.orderRepository.find({
+        where: {
+          orderDetails: {
+            orderProcessor: {
+              agentId: userId,
+            },
+          },
+        },
+        relations: {
+          customer: true,
+          orderDetails: {
+            product: true,
+          },
+          delivery_site: {
+            sector: {
+              district: {
+                province: true,
+              },
+            },
+          },
+        },
       })
-
-      // Extract the order items from OrderProcess entities
-      const orderItems = orderProcesses.map(
-        (orderProcess) => orderProcess.orderItem,
-      )
-
-      // Extract unique orders from the order items using a set to avoid duplicates
-      const uniqueOrderIds = Array.from(
-        new Set(orderItems.map((orderItem) => orderItem.order.id)),
-      )
-      // Fetch additional details for the orders
-      const detailedOrders = await this.orderRepository.find({
-        where: { id: In(uniqueOrderIds) },
-        relations: ['customer', 'delivery_site', 'orderDetails'],
-      })
-
-      return detailedOrders
     }
 
     return []

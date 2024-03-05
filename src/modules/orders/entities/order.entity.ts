@@ -36,7 +36,7 @@ export class Order {
   @ManyToOne(() => User, (customer) => customer.orders)
   customer: User
 
-  @OneToMany(() => Site, (site) => site.orders)
+  @ManyToOne(() => Site, (site) => site.orders)
   delivery_site: Site
 }
 
