@@ -1,6 +1,6 @@
-import { OrderProcess } from 'src/modules/orders/entities/order-process.entity'
-import { Order } from 'src/modules/orders/entities/order.entity'
-import { Supplier } from 'src/modules/supplier/entities/supplier.entity'
+import { OrderProcess } from '../../orders/entities/order-process.entity'
+import { Order } from '../../orders/entities/order.entity'
+import { Supplier } from '../../supplier/entities/supplier.entity'
 import {
   Column,
   Entity,
