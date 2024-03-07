@@ -1,5 +1,5 @@
-import { Category } from 'src/modules/categories/entities/category.entity'
-import { Product } from 'src/modules/products/entities/product.entity'
+import { Category } from '../../categories/entities/category.entity'
+import { Product } from '../../products/entities/product.entity'
 import {
   Column,
   Entity,
