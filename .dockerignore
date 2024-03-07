@@ -5,7 +5,6 @@ npm-debug.log
 dist
 .git
 .gitignore
-.env
 README.md
 .github
 .vscode

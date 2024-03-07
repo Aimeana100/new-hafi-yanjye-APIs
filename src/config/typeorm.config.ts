@@ -32,13 +32,19 @@ export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
     username: configService.get<string>('DB_USERNAME'),
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_NAME'),
+    // host: 'postgres',
+    // port: 5432,
+    // username: 'postgres',
+    // password: 'postgres',
+    // database: 'postgres',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: true,
-    ssl:
-      configService.get<string>('NODE_ENV') === 'development'
-        ? false
-        : {
-            rejectUnauthorized: true, // This line is optional and might be needed depending on your PostgreSQL server setup
-          },
+    ssl: false,
+    // ssl:
+    //   configService.get<string>('NODE_ENV') === 'development'
+    //     ? false
+    //     : {
+    //         rejectUnauthorized: true,
+    //       },
   }),
 }
