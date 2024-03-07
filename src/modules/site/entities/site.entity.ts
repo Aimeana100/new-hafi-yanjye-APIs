@@ -8,7 +8,7 @@ import {
 import { District } from './district.entity'
 import { Province } from './province.entity'
 import { Sector } from './sector.entity'
-import { Order } from 'src/modules/orders/entities/order.entity'
+import { Order } from '../../orders/entities/order.entity'
 // import { Cell } from './cell.entity'
 
 @Entity()

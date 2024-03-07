@@ -6,9 +6,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { OrderDetails } from './order-details.entity'
-import { User } from 'src/modules/users/entities/user.entity'
-import { Coupon } from 'src/modules/coupons/entities/coupon.entity'
-import { Site } from 'src/modules/site/entities/site.entity'
+import { User } from '../../users/entities/user.entity'
+import { Coupon } from '../../coupons/entities/coupon.entity'
+import { Site } from '../../site/entities/site.entity'
 
 @Entity()
 export class Order {

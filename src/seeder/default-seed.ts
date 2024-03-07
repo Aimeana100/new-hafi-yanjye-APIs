@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from 'src/app.module'
-import { BcryptService } from 'src/modules/auth/bcrypt.service'
-import { Role, User } from 'src/modules/users/entities/user.entity'
+import { BcryptService } from '../modules/auth/bcrypt.service'
+import { Role, User } from '../modules/users/entities/user.entity'
 import { Connection } from 'typeorm'
 
 export const defaultSeed = async () => {

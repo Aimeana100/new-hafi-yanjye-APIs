@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { OrderDetails } from './order-details.entity'
-import { User } from 'src/modules/users/entities/user.entity'
-import { Supplier } from 'src/modules/supplier/entities/supplier.entity'
+import { User } from '../../users/entities/user.entity'
+import { Supplier } from '../../supplier/entities/supplier.entity'
 
 export enum ProcessStatuses {
   ASSIGNED = 'ASSIGNED',
