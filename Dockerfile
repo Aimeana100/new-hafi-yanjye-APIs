@@ -18,7 +18,7 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 
 # Expose the port if needed (not necessary in most cases)
-EXPOSE 5000
+EXPOSE 3000
 
 
 # Specify the command to run your application

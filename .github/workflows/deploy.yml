@@ -37,5 +37,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yml administrator@${SERVER_IP}:~/hafiyacu_nest_app/docker-compose.yml
-          ssh -o StrictHostKeyChecking=no administrator@${SERVER_IP} 'docker-compose -f ~/hafiyacu_nest_app/docker-compose.yml up -d'
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa.pub
+          scp -o StrictHostKeyChecking=no docker-compose.dev.yml administrator@${SERVER_IP}:~/hafiyacu_nest_app/docker-compose.dev.yml
+          ssh -o StrictHostKeyChecking=no administrator@${SERVER_IP} 'docker-compose -f ~/hafiyacu_nest_app/docker-compose.dev.yml up -d'
