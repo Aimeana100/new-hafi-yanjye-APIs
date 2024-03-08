@@ -27,24 +27,23 @@ export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
     type: 'postgres',
-    // host: configService.get<string>('DB_HOST'),
-    // port: configService.get<number>('DB_PORT'),
-    // username: configService.get<string>('DB_USERNAME'),
-    // password: configService.get<string>('DB_PASSWORD'),
-    // database: configService.get<string>('DB_NAME'),
-    host: 'postgres',
-    port: 5433,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'postgres',
+    host: configService.get<string>('DB_HOST'),
+    port: configService.get<number>('DB_PORT'),
+    username: configService.get<string>('DB_USERNAME'),
+    password: configService.get<string>('DB_PASSWORD'),
+    database: configService.get<string>('DB_NAME'),
+    // host: 'postgres',
+    // port: 5433,
+    // username: 'postgres',
+    // password: 'postgres',
+    // database: 'postgres',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: true,
-    ssl: false,
-    // ssl:
-    //   configService.get<string>('NODE_ENV') === 'development'
-    //     ? false
-    //     : {
-    //         rejectUnauthorized: true,
-    //       },
+    ssl:
+      configService.get<string>('SSL_ALLOWED').toLocaleLowerCase() === 'true'
+        ? {
+            rejectUnauthorized: true,
+          }
+        : false,
   }),
 }
