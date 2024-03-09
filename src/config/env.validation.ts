@@ -31,6 +31,14 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   FRONTEND: string
+
+  @IsNotEmpty()
+  @IsString()
+  SSL_ALLOWED: string
+
+  @IsNotEmpty()
+  @IsString()
+  PORT: string
 }
 
 export function validate(config: Record<string, unknown>) {

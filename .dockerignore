@@ -11,3 +11,5 @@ README.md
 npm-debug.log
 npm-debug.log.*
 error.log
+pgdata
+nginix
