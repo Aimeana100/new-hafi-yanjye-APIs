@@ -1,6 +1,6 @@
 # Build
 FROM node:20-alpine AS build
-WORKDIR /usr/src/app
+WORKDIR /app/backend
 COPY package*.json  ./
 RUN yarn
 COPY . .
@@ -10,12 +10,12 @@ RUN yarn build
 
 # Production
 FROM node:20-alpine AS production
-WORKDIR /usr/src/app
+WORKDIR /app/backend
 
 
 # Copy built files and node_modules from the build stage
-COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /app/backend/dist ./dist
+COPY --from=build /app/backend/node_modules ./node_modules
 
 # Expose the port if needed (not necessary in most cases)
 EXPOSE 3000
