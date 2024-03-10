@@ -1,7 +1,7 @@
 # Use an official Nginx image as the base
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./default.conf /etc/nginx/conf.d/default.conf
 
 # Expose the port that Nginx will listen on
 EXPOSE 8000
