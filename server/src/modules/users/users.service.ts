@@ -110,6 +110,7 @@ export class UsersService {
         .leftJoinAndSelect('user.orderProcessor', 'orderProcess')
         .leftJoinAndSelect('orderProcess.orderItem', 'orderItem')
         .leftJoinAndSelect('orderItem.order', 'order')
+        .leftJoinAndSelect('orderItem.product', 'product')
         .getMany()
     } else if (role === Role.CUSTOMER) {
       return await query

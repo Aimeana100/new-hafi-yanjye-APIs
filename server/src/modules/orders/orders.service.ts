@@ -161,6 +161,9 @@ export class OrdersService {
             product: true,
             orderProcessor: {
               agent: true,
+              orderItem: {
+                product: true,
+              },
             },
           },
           delivery_site: {
@@ -185,6 +188,9 @@ export class OrdersService {
             product: true,
             orderProcessor: {
               agent: true,
+              orderItem: {
+                product: true,
+              },
             },
           },
           delivery_site: {
