@@ -4,7 +4,8 @@
 
 # Envirnment
 /server/*.env
-/*.env
+./.env
+.env
 # Logs
 /server/logs
 /server/*.log
