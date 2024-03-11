@@ -31,7 +31,7 @@ export class ProductsService {
         },
       },
     })
-    if (!item) {
+    if (item) {
       throw new BadRequestException(
         'Product name already exists under the same category ',
       )
