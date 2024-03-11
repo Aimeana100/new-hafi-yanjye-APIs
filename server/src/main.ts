@@ -15,7 +15,7 @@ async function bootstrap() {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
   })
   SwaggerModule.setup('docs', app, document, customOptions)
-  await app.listen(parseInt(process.env.PORT) || 3000)
+  await app.listen(parseInt(process.env.PORT) || 5000)
   defaultSeed()
 }
 bootstrap()

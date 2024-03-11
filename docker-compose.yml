@@ -1,73 +1,41 @@
-version: '3.5'
-
+version: "3"
 services:
-  server:
-    container_name: hafiyacu_backend
-    image: hafiyacu_backend:0.0.1
-    build:
-      context: .
-    ports:
-      - ${PORT}:${PORT}
+  postgres:
+    image: "postgres:latest"
     environment:
-      PORT: ${PORT}
-      NODE_ENV: ${NODE_ENV}
-      DB_HOST: db
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_SIGN_OPTIONS: ${JWT_SIGN_OPTIONS}
-      JWT_ACCESS_TOKEN_TTL: ${JWT_ACCESS_TOKEN_TTL}
-      MAIL_NAME: ${MAIL_NAME}
-      MAIL_PASS: ${MAIL_PASS}
-      FRONTEND: ${FRONTEND}
-    networks:
-      - shared-network
-    volumes:
-      - .:/app/backend
-      - /app/backend/node_modules
-    depends_on:
-      - db
-
-  db:
-    container_name: hafiyacu_db
-    image: "postgres"
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    networks:
-      - shared-network
-    volumes:
-      - hafiyacu_data:/var/lib/postgresql/data
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: always
-    container_name: nest-pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_MAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-    ports:
-      - '5050:80'
-    depends_on:
-      - db
+      - POSTGRES_PASSWORD=postgres_password
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: nginx_server
-    ports:
-      - "8000:8000"
     depends_on:
-      - server
-    networks:
-      - shared-network
-
-volumes:
-  hafiyacu_data:
-networks:
-  shared-network:
-    driver: bridge
+      - api
+      - client
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "3050:80"
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: "./server"
+    ports:
+      - "5000:5000"
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
