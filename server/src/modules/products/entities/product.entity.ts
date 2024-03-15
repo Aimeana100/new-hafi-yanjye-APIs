@@ -26,7 +26,7 @@ export class Product {
   @Column()
   cost: number
   @Column()
-  quatity: number
+  quantity: number
 
   @Column({ nullable: true })
   datasheet_link: string

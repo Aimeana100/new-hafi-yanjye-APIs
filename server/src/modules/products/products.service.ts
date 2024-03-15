@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
@@ -10,6 +11,9 @@ import { ProductRepository } from './products.repository'
 import { CategoryRepository } from '../categories/categories.repository'
 import { ProductImageRepository } from './product-image.repository'
 import { FilterProductDto } from './dto/get-all-products.dto'
+import { CloudinaryService } from '../cloudinary/cloudinary.service'
+import { UploadApiResponse } from 'cloudinary'
+import { Multer } from 'multer'
 
 @Injectable()
 export class ProductsService {
@@ -20,9 +24,13 @@ export class ProductsService {
     private productImageRepository: ProductImageRepository,
     @InjectRepository(CategoryRepository)
     private categoryRepository: CategoryRepository,
+    @Inject(CloudinaryService) private cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async create(
+    images: Express.Multer.File[],
+    createProductDto: CreateProductDto,
+  ) {
     const item = await this.productRepository.findOne({
       where: {
         name: createProductDto.name,
@@ -31,11 +39,13 @@ export class ProductsService {
         },
       },
     })
+
     if (item) {
       throw new BadRequestException(
-        'Product name already exists under the same category ',
+        'Product name already exists under the same category',
       )
     }
+
     const category = await this.categoryRepository.findOne({
       where: { id: createProductDto.categoryId },
     })
@@ -47,24 +57,33 @@ export class ProductsService {
     }
 
     // Create a new Product entity and associate it with the loaded category
-    const productEntinty = this.productRepository.create({
+    const product = this.productRepository.create({
       ...createProductDto,
-      category: { ...category },
+      category: category,
     })
 
-    const product = await this.productRepository.save(productEntinty, {
-      data: { category: true },
-    })
-
-    const productImages = createProductDto.images.map((image) =>
-      this.productImageRepository.create({ ...image, product }),
+    const uploadedLinks = await this.cloudinaryService.uploadImages(images)
+    // Save the product entity to the database
+    await this.productRepository.save(product)
+    // Create new ProductImage entities and associate them with the saved product
+    const productImages = uploadedLinks.map((image) =>
+      this.productImageRepository.create({
+        name: image.original_filename,
+        link: image.secure_url,
+        product,
+      }),
     )
 
-    // Save the product and its associated images to the database
-    productEntinty.images =
-      await this.productImageRepository.save(productImages)
+    // Set the images directly on the product entity before saving
+    product.images = await this.productImageRepository.save(productImages)
 
-    return product
+    // Save the product entity again to update the images relationship
+    await this.productRepository.save(product)
+
+    return this.productRepository.findOne({
+      where: { id: product.id },
+      relations: { images: true, category: true },
+    })
   }
 
   async findAll(filterProductDto: FilterProductDto) {
