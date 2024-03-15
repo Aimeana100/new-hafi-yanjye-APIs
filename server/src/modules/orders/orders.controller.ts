@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Patch,
+} from '@nestjs/common'
 import { OrdersService } from './orders.service'
 import { CreateOrderDto } from './dto/create-order.dto'
 // import { UpdateOrderDto } from './dto/update-order.dto'
@@ -44,8 +52,14 @@ export class OrdersController {
     return this.ordersService.findAll()
   }
 
+  @ApiOperation({ summary: 'Retrieve single order' })
+  @ApiResponse({ status: 201, description: 'All Orders' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @Roles(Role.CUSTOMER, Role.AGENT, Role.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Get(':id')
-  @ApiOperation({ summary: 'Rertrieve single order' })
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(+id)
   }
@@ -60,6 +74,16 @@ export class OrdersController {
   @Post('assign/agent')
   asignOrderToAgent(@Body() asignOrderAgentDto: AsignOrderAgentDto) {
     return this.ordersService.asignOrderAgent(asignOrderAgentDto)
+  }
+
+  @Patch('confirm/:id')
+  confirmOrder(@Param('id') id: string) {
+    return this.ordersService.confirmOrder(+id)
+  }
+
+  @Patch('cancel/:id')
+  cancelOrder(@Param('id') id: string) {
+    return this.ordersService.concelOrder(+id)
   }
 
   // @Patch(':id')
