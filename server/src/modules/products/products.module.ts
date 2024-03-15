@@ -7,6 +7,7 @@ import { ProductRepository } from './products.repository'
 import { CategoriesModule } from '../categories/categories.module'
 import { ProductImage } from './entities/product-image.entity'
 import { ProductImageRepository } from './product-image.repository'
+import { CloudinaryService } from '../cloudinary/cloudinary.service'
 
 @Module({
   imports: [
@@ -19,6 +20,11 @@ import { ProductImageRepository } from './product-image.repository'
     CategoriesModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService, ProductRepository, ProductImageRepository],
+  providers: [
+    ProductsService,
+    ProductRepository,
+    ProductImageRepository,
+    CloudinaryService,
+  ],
 })
 export class ProductsModule {}
