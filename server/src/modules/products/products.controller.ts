@@ -1,15 +1,16 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
   Query,
-  UseInterceptors,
   UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -28,6 +29,8 @@ import { Roles } from '../auth/roles/roles.decorator'
 import { Role } from '../users/entities/user.entity'
 import { AuthGuard } from '../auth/auth.guard'
 import { RolesGuard } from '../auth/roles/roles.guard'
+import { CreateProductReviewDto } from './dto/create-product-review.dto'
+
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -72,5 +75,35 @@ export class ProductsController {
   @ApiOperation({ summary: 'Delete a product' })
   remove(@Param('id') id: string) {
     return this.productsService.remove(+id)
+  }
+
+  @Roles(Role.ADMIN, Role.DRIVER, Role.AGENT, Role.CUSTOMER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Create a review' })
+  @ApiResponse({ status: 201, description: 'Review added successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @ApiBearerAuth()
+  @Post(':productId/reviews')
+  createReview(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() createProductReviewDto: CreateProductReviewDto,
+  ) {
+    return this.productsService.createReview(productId, createProductReviewDto)
+  }
+
+  @Roles(Role.ADMIN, Role.DRIVER, Role.AGENT, Role.CUSTOMER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Create a review' })
+  @ApiResponse({ status: 201, description: 'Review added successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @ApiBearerAuth()
+  @Patch(':productId/reviews')
+  updateReview(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() updateProductReviewDto: CreateProductReviewDto,
+  ) {
+    return this.productsService.updateReview(productId, updateProductReviewDto)
   }
 }

@@ -8,7 +8,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  telphone: string
+  telephone: string
 
   @IsEnum(Role)
   role: Role

@@ -13,6 +13,9 @@ import { validate } from './config/env.validation'
 import { AuthModule } from './modules/auth/auth.module'
 import { SiteModule } from './modules/site/site.module'
 import { SupplierModule } from './modules/supplier/supplier.module'
+import { FaqModule } from './modules/faq/faq.module'
+import { PayementModule } from './modules/payement/payement.module'
+import { PaymentModule } from './modules/payment/payment.module'
 @Module({
   imports: [
     UsersModule,
@@ -27,6 +30,9 @@ import { SupplierModule } from './modules/supplier/supplier.module'
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     SiteModule,
     SupplierModule,
+    FaqModule,
+    PayementModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

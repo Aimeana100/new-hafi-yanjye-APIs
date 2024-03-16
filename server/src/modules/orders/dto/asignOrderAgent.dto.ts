@@ -1,6 +1,6 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsNumber } from 'class-validator'
 
-export class AsignOrderAgentDto {
+export class AssignOrderAgentDto {
   @IsNotEmpty()
   @IsNumber()
   agentId: number

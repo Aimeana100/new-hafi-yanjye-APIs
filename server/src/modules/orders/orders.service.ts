@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { CreateOrderDto } from './dto/create-order.dto'
 import { UpdateOrderDto } from './dto/update-order.dto'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -13,9 +18,10 @@ import { CustomRequest } from '../auth/auth.constants'
 import { Role } from '../users/entities/user.entity'
 import { In, Repository, SelectQueryBuilder } from 'typeorm'
 import { OrderProcess } from './entities/order-process.entity'
-import { AsignOrderAgentDto } from './dto/asignOrderAgent.dto'
+import { AssignOrderAgentDto } from './dto/asignOrderAgent.dto'
 import { SiteRepository } from '../site/site.repository'
 import { Site } from '../site/entities/site.entity'
+import { AssignOderRoDriverDto } from './dto/assign-oder-ro-driver.dto'
 
 @Injectable()
 export class OrdersService {
@@ -100,7 +106,7 @@ export class OrdersService {
     return newOrder
   }
 
-  async asignOrderAgent(asignOrderAgentDto: AsignOrderAgentDto) {
+  async assignOrderAgent(asignOrderAgentDto: AssignOrderAgentDto) {
     const { agentId, orderItems } = asignOrderAgentDto
     const agent = await this.userRepository.findOne({
       where: { id: agentId, role: Role.AGENT },
@@ -110,30 +116,29 @@ export class OrdersService {
       throw new NotFoundException(`Could not find agent with Id: ${agentId} `)
     }
 
-    const unexstitngOrderItems: number[] = []
-    const validOrderItems: OrderDetails[] = []
+    const unexstingOrderItems: number[] = []
     const orderAgents: OrderProcess[] = []
 
     for (const orderItemId of orderItems) {
-      const orderDetatil = await this.orderDetailsRepository.findOne({
+      const orderDetail = await this.orderDetailsRepository.findOne({
         where: { id: orderItemId },
       })
-      if (!orderDetatil) {
-        unexstitngOrderItems.push(orderItemId)
+      if (!orderDetail) {
+        unexstingOrderItems.push(orderItemId)
       } else {
         const orderAgent = this.orderProcessRepository.create({
-          orderItemId: orderDetatil.id,
+          orderItemId: orderDetail.id,
           agent,
-          orderItem: orderDetatil,
+          orderItem: orderDetail,
           agentId: agent.id,
         })
         orderAgents.push(orderAgent)
       }
     }
 
-    if (unexstitngOrderItems.length) {
+    if (unexstingOrderItems.length) {
       throw new NotFoundException(
-        `OrderDetails with ${unexstitngOrderItems.join(', ')} not found `,
+        `OrderDetails with ${unexstingOrderItems.join(', ')} not found `,
       )
     }
 
@@ -206,6 +211,29 @@ export class OrdersService {
             orderProcessor: {
               agentId: userId,
             },
+          },
+        },
+        relations: {
+          customer: true,
+          orderDetails: {
+            product: true,
+          },
+          delivery_site: {
+            sector: {
+              district: {
+                province: true,
+              },
+            },
+          },
+        },
+      })
+    }
+
+    if (role === Role.DRIVER) {
+      return this.orderRepository.find({
+        where: {
+          driver: {
+            id: userId,
           },
         },
         relations: {
@@ -308,6 +336,29 @@ export class OrdersService {
         },
       })
     }
+    if (role == Role.DRIVER) {
+      return this.orderRepository.findOne({
+        where: {
+          driver: {
+            id: userId,
+          },
+          id,
+        },
+        relations: {
+          customer: true,
+          orderDetails: {
+            product: true,
+          },
+          delivery_site: {
+            sector: {
+              district: {
+                province: true,
+              },
+            },
+          },
+        },
+      })
+    }
   }
 
   update(id: number, updateOrderDto: UpdateOrderDto) {
@@ -320,6 +371,56 @@ export class OrdersService {
 
   concelOrder(id: number) {
     return this.updateOrderStatus(id, OrderStatus.CANCELED)
+  }
+
+  async assignOrderToDriver(assignOrderToDriverDto: AssignOderRoDriverDto) {
+    const { driverId, orderId } = assignOrderToDriverDto
+    const driver = await this.userRepository.findOne({
+      where: { id: driverId, role: Role.DRIVER },
+    })
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['driver'],
+    })
+    if (!driver) {
+      throw new NotFoundException('Driver not found')
+    }
+    if (!order) {
+      throw new NotFoundException('Order not found')
+    }
+    if (order.driver) {
+      throw new BadRequestException(
+        `The order has already assigned a driver ${order.driver.fullName}`,
+      )
+    }
+    order.driver = driver
+    return this.orderRepository.save(order)
+  }
+
+  async deliverOrder(orderId: number) {
+    const { id: userId } = this.request.user
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId, driver: { id: userId } },
+      relations: ['driver'],
+    })
+    if (!order) {
+      throw new NotFoundException(
+        'Order not found or is not assigned to a driver',
+      )
+    }
+    return this.orderRepository.update(orderId, {
+      status: OrderStatus.DELIVERED,
+    })
+  }
+
+  completeOrder(orderId: number) {
+    const order = this.orderRepository.findOne({ where: { id: orderId } })
+    if (!order) {
+      throw new NotFoundException('Order not found')
+    }
+    return this.orderRepository.update(orderId, {
+      status: OrderStatus.COMPLETED,
+    })
   }
 
   private async updateOrderStatus(id: number, status: OrderStatus) {
