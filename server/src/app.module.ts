@@ -14,7 +14,6 @@ import { AuthModule } from './modules/auth/auth.module'
 import { SiteModule } from './modules/site/site.module'
 import { SupplierModule } from './modules/supplier/supplier.module'
 import { FaqModule } from './modules/faq/faq.module'
-import { PayementModule } from './modules/payement/payement.module'
 import { PaymentModule } from './modules/payment/payment.module'
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { PaymentModule } from './modules/payment/payment.module'
     SiteModule,
     SupplierModule,
     FaqModule,
-    PayementModule,
     PaymentModule,
   ],
   controllers: [],
