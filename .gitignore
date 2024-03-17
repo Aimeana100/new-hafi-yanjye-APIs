@@ -39,3 +39,4 @@
 /server/!.vscode/extensions.json
 /server/pgdata
 /.idea
+/qodana.yaml

@@ -1,7 +1,6 @@
 import {
   IsNotEmpty,
   IsNumber,
-  IsObject,
   IsString,
   // ValidateNested,
 } from 'class-validator'
