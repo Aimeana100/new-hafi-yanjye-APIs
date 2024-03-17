@@ -40,9 +40,14 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto)
   }
-
-  @Get()
+  @Roles(Role.ADMIN, Role.AGENT)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'All successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @ApiBearerAuth()
+  @Get()
   findAll(@Query() filterUsersDto: FilterUsersDto) {
     return this.usersService.findAll(filterUsersDto)
   }

@@ -26,7 +26,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private userRepsitory: UserRepository,
+    private userRepository: UserRepository,
     private readonly bcryptService: BcryptService,
     private mailService: MailService,
     @Inject(ConfigService) private readonly configService: ConfigService,
@@ -52,16 +52,16 @@ export class AuthService {
   }
 
   async signUp(signUpto: SignUpDto) {
-    const user = await this.userRepsitory.getUserByEmail(signUpto.email)
+    const user = await this.userRepository.getUserByEmail(signUpto.email)
     if (user) {
       throw new ConflictException('User with the same Email already exists')
     }
-    const userEntity = this.userRepsitory.create({
+    const userEntity = this.userRepository.create({
       ...signUpto,
       role: Role.CUSTOMER,
       password: await this.bcryptService.hash(signUpto.password),
     })
-    const newUser = await this.userRepsitory.save(userEntity)
+    const newUser = await this.userRepository.save(userEntity)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userPublic } = newUser
     return userPublic
@@ -93,7 +93,7 @@ export class AuthService {
                 background-color: #FAFAFA;
                 color: #333;
                 margin: 0;
-                padding: 10;
+                padding: 10px;
               }
     
               header {
@@ -159,17 +159,17 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found')
     }
-    const userEntity = this.userRepsitory.create({
+    const userEntity = this.userRepository.create({
       ...user,
       password: await this.bcryptService.hash(updatePasswordDto.newPassword),
     })
-    await this.userRepsitory.save(userEntity)
+    await this.userRepository.save(userEntity)
     return { message: `New Password changed successfully ` }
   }
 
   async changePassword(changePasswordDto: ChangePasswordDto) {
     const { email } = this.request.user
-    const user = await this.userRepsitory.findOne({
+    const user = await this.userRepository.findOne({
       where: { email },
     })
     if (
@@ -181,16 +181,16 @@ export class AuthService {
       throw new UnauthorizedException('Old password is incorrect')
     }
 
-    const newHasedPassword = await this.bcryptService.hash(
+    const newHashedPassword = await this.bcryptService.hash(
       changePasswordDto.newPassword,
     )
 
-    const userEntity = this.userRepsitory.create({
+    const userEntity = this.userRepository.create({
       ...user,
-      password: newHasedPassword,
+      password: newHashedPassword,
     })
 
-    await this.userRepsitory.save(userEntity)
+    await this.userRepository.save(userEntity)
     return { message: 'Password changed successfully' }
   }
 }

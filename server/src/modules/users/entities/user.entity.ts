@@ -8,6 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
+import { ProductReview } from '../../products/entities/product-review.entity'
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -25,7 +26,7 @@ export class User {
   fullName: string
 
   @Column()
-  telphone: string
+  telephone: string
 
   @Column({ nullable: true })
   tinNumber: string
@@ -38,11 +39,17 @@ export class User {
   @OneToMany(() => Order, (orders) => orders.customer)
   orders: Order[]
 
+  @OneToMany(() => Order, (orders) => orders.driver)
+  deliveries: Order[]
+
   @OneToMany(() => OrderProcess, (orderProcessor) => orderProcessor.agent)
   orderProcessor: OrderProcess[]
 
   @OneToMany(() => Supplier, (supplier) => supplier.createdBy)
   supplier: Supplier
+
+  @OneToMany(() => ProductReview, (rating) => rating.rater)
+  ratings: ProductReview[]
 
   @Column({ unique: true })
   email: string

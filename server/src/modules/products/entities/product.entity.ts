@@ -10,6 +10,7 @@ import {
 import { ProductImage } from './product-image.entity'
 import { Category } from '../../categories/entities/category.entity'
 import { OrderDetails } from '../../orders/entities/order-details.entity'
+import { ProductReview } from './product-review.entity'
 
 @Entity()
 export class Product {
@@ -28,6 +29,9 @@ export class Product {
   @Column()
   quantity: number
 
+  @Column({ default: 0 })
+  averageRating: number
+
   @Column({ nullable: true })
   datasheet_link: string
 
@@ -35,7 +39,7 @@ export class Product {
   video_link: string
 
   @DeleteDateColumn()
-  delete: Date
+  deletedAt: Date
 
   @CreateDateColumn()
   createAt: Date
@@ -46,4 +50,6 @@ export class Product {
   category: Category
   @ManyToOne(() => OrderDetails, (order) => order.product)
   orders: OrderDetails[]
+  @OneToMany(() => ProductReview, (ratings) => ratings.product)
+  ratings: ProductReview[]
 }

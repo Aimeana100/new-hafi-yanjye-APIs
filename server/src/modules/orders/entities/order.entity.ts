@@ -36,6 +36,9 @@ export class Order {
   @ManyToOne(() => User, (customer) => customer.orders)
   customer: User
 
+  @ManyToOne(() => User, (driver) => driver.orders)
+  driver: User
+
   @ManyToOne(() => Site, (site) => site.orders)
   delivery_site: Site
 }

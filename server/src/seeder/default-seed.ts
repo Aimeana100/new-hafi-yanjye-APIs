@@ -19,7 +19,7 @@ export const defaultSeed = async () => {
   if (!userExist) {
     await typeOrmConnection.manager.save(User, {
       fullName: 'Anathole',
-      telphone: '07856475',
+      telephone: '07856475',
       role: Role.ADMIN,
       email: 'admin@gmail.com',
       password: await bcryptService.hash('12345678'),

@@ -8,6 +8,8 @@ import { CategoriesModule } from '../categories/categories.module'
 import { ProductImage } from './entities/product-image.entity'
 import { ProductImageRepository } from './product-image.repository'
 import { CloudinaryService } from '../cloudinary/cloudinary.service'
+import { ProductReviewRepository } from './products-review.repository'
+import { UserRepository } from '../users/user.repository'
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service'
     ProductRepository,
     ProductImageRepository,
     CloudinaryService,
+    ProductReviewRepository,
+    UserRepository,
   ],
 })
 export class ProductsModule {}
