@@ -53,7 +53,6 @@ export class OrdersController {
   findAll() {
     return this.ordersService.findAll()
   }
-
   @ApiOperation({ summary: 'Retrieve single order' })
   @ApiResponse({ status: 201, description: 'All Orders' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })

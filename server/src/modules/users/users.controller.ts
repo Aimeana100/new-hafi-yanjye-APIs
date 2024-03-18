@@ -1,13 +1,13 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
+  UseGuards,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -40,23 +40,18 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto)
   }
-  @Roles(Role.ADMIN, Role.AGENT)
-  @UseGuards(AuthGuard, RolesGuard)
+
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'All successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @Roles(Role.ADMIN, Role.AGENT)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get()
   findAll(@Query() filterUsersDto: FilterUsersDto) {
     return this.usersService.findAll(filterUsersDto)
   }
-
-  // @Get()
-  // @ApiOperation({ summary: 'Get all users' })
-  // findAllAgents(@Query() filterUsersDto: FilterUsersDto) {
-  //   return this.usersService.findAll(filterUsersDto)
-  // }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get single user by id' })
@@ -69,7 +64,17 @@ export class UsersController {
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto)
   }
-
+  @ApiOperation({ summary: 'My account' })
+  @ApiResponse({ status: 200, description: 'me' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Forbidden access' })
+  @Roles(Role.ADMIN, Role.AGENT, Role.DRIVER, Role.DRIVER)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Get('account/me')
+  account() {
+    return this.usersService.me()
+  }
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id)
