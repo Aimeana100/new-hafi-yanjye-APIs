@@ -6,6 +6,9 @@
 /server/*.env
 ./.env
 .env
+qodana.yaml
+.idea
+
 # Logs
 /server/logs
 /server/*.log
