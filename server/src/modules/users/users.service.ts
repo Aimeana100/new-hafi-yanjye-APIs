@@ -8,6 +8,8 @@ import { EmailOption, MailService } from 'src/utils/emails'
 import { BcryptService } from '../auth/bcrypt.service'
 import { FilterUsersDto } from './dto/get-all-users.dto'
 import { Role } from './entities/user.entity'
+import { REQUEST } from '@nestjs/core'
+import { CustomRequest } from '../auth/auth.constants'
 // import { OrderStatus } from '../orders/entities/order.entity'
 // import { OrderDetails } from '../orders/entities/order-details.entity'
 // import { OrderProcess } from '../orders/entities/order-process.entity'
@@ -18,6 +20,7 @@ export class UsersService {
     @InjectRepository(UserRepository) private userRepository: UserRepository,
     @Inject(MailService) private mailService: MailService,
     @Inject(BcryptService) private bcyService: BcryptService,
+    @Inject(REQUEST) private readonly request: CustomRequest,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -62,7 +65,7 @@ export class UsersService {
       `,
     }
 
-    this.mailService.sendResetEmail(emailOption)
+    await this.mailService.sendResetEmail(emailOption)
     return this.userRepository.save(userEntity)
   }
 
@@ -124,10 +127,17 @@ export class UsersService {
     return query.getMany()
   }
 
+  me() {
+    const { id: userId } = this.request.user
+    return this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['settings'],
+    })
+  }
+
   async findOne(id: number) {
     return await this.userRepository.findOne({
       where: { id },
-
       relations: [
         'orderProcessor',
         'orderProcessor.orderItem',
@@ -144,7 +154,7 @@ export class UsersService {
   }
 
   remove(id: number) {
-    return this.userRepository.delete(id)
+    return this.userRepository.softDelete(id)
   }
 
   async findByEmail(email: string) {

@@ -15,6 +15,7 @@ import { SiteModule } from './modules/site/site.module'
 import { SupplierModule } from './modules/supplier/supplier.module'
 import { FaqModule } from './modules/faq/faq.module'
 import { PaymentModule } from './modules/payment/payment.module'
+import { SettingsModule } from './modules/settings/settings.module'
 @Module({
   imports: [
     UsersModule,
@@ -31,6 +32,7 @@ import { PaymentModule } from './modules/payment/payment.module'
     SupplierModule,
     FaqModule,
     PaymentModule,
+    SettingsModule,
   ],
   controllers: [],
   providers: [],
