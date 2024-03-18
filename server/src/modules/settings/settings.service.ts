@@ -25,7 +25,6 @@ export class SettingsService {
 
     const settings = user.settings
     if (settings) {
-      // return this.settingsRepository.update(settings.id, updateSettingsDto)
       Object.assign(settings, updateSettingsDto)
       await this.settingsRepository.save(settings)
       return this.userRepository.findOne({
