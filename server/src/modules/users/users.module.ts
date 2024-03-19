@@ -6,11 +6,22 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { MailService } from 'src/utils/emails'
 import { BcryptService } from '../auth/bcrypt.service'
+import { SettingsRepository } from '../settings/settings.repository'
+import { SettingsModule } from '../settings/settings.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserRepository])],
+  imports: [
+    TypeOrmModule.forFeature([User, UserRepository, SettingsRepository]),
+    SettingsModule,
+  ],
   controllers: [UsersController],
-  providers: [UsersService, MailService, UserRepository, BcryptService],
-  exports: [UserRepository],
+  providers: [
+    UsersService,
+    MailService,
+    UserRepository,
+    BcryptService,
+    SettingsRepository,
+  ],
+  exports: [UserRepository, SettingsRepository],
 })
 export class UsersModule {}

@@ -45,7 +45,10 @@ export class Setting {
   @Column({ default: true })
   receiveUpdateNotifications: boolean
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.settings, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn()
   user: User
 }

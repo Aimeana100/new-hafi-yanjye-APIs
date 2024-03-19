@@ -9,6 +9,7 @@ import { User } from '../users/entities/user.entity'
 import { UsersService } from '../users/users.service'
 import { MailService } from 'src/utils/emails'
 import { BcryptService } from '../auth/bcrypt.service'
+import { SettingsRepository } from '../settings/settings.repository'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { BcryptService } from '../auth/bcrypt.service'
       User,
       SupplierRepository,
       UserRepository,
+      SettingsRepository,
     ]),
   ],
   controllers: [SupplierController],
@@ -27,6 +29,7 @@ import { BcryptService } from '../auth/bcrypt.service'
     SupplierRepository,
     UserRepository,
     BcryptService,
+    SettingsRepository,
   ],
 })
 export class SupplierModule {}

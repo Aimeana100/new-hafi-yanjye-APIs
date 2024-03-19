@@ -68,7 +68,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'me' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({ status: 403, description: 'Forbidden access' })
-  @Roles(Role.ADMIN, Role.AGENT, Role.DRIVER, Role.DRIVER)
+  @Roles(Role.ADMIN, Role.AGENT, Role.DRIVER, Role.CUSTOMER)
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get('account/me')

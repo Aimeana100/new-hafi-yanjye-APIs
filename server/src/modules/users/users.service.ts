@@ -7,12 +7,15 @@ import { generateRandomPassword } from 'src/utils/generate-password'
 import { EmailOption, MailService } from 'src/utils/emails'
 import { BcryptService } from '../auth/bcrypt.service'
 import { FilterUsersDto } from './dto/get-all-users.dto'
-import { Role } from './entities/user.entity'
+import { Role, User } from './entities/user.entity'
 import { REQUEST } from '@nestjs/core'
 import { CustomRequest } from '../auth/auth.constants'
-// import { OrderStatus } from '../orders/entities/order.entity'
-// import { OrderDetails } from '../orders/entities/order-details.entity'
-// import { OrderProcess } from '../orders/entities/order-process.entity'
+import {
+  CURRENCY,
+  LANGUAGE,
+  Setting,
+} from '../settings/entities/settings.entity'
+import { SettingsRepository } from '../settings/settings.repository'
 
 @Injectable()
 export class UsersService {
@@ -20,11 +23,13 @@ export class UsersService {
     @InjectRepository(UserRepository) private userRepository: UserRepository,
     @Inject(MailService) private mailService: MailService,
     @Inject(BcryptService) private bcyService: BcryptService,
+    @InjectRepository(SettingsRepository)
+    private settingsRepository: SettingsRepository,
     @Inject(REQUEST) private readonly request: CustomRequest,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const user = await this.findByEmail(createUserDto.email)
+    let user = await this.findByEmail(createUserDto.email)
     if (user) {
       throw new ConflictException('User with the same Email already exists')
     }
@@ -66,7 +71,26 @@ export class UsersService {
     }
 
     await this.mailService.sendResetEmail(emailOption)
-    return this.userRepository.save(userEntity)
+    user = await this.userRepository.save(userEntity)
+    await this.createDefaultSettings(user)
+    return user
+  }
+
+  async createDefaultSettings(user: User): Promise<void> {
+    const settings = new Setting()
+    settings.user = user
+    settings.preferredCurrency = CURRENCY.FRW
+    settings.preferredLanguage = LANGUAGE.EN
+    settings.receiveOrderNotifications = true
+    settings.receiveReminderNotifications = true
+    settings.receiveOfferNotifications = true
+    settings.receiveFeedbackNotifications = true
+    settings.receiveUpdateNotifications = true
+
+    const setting = await this.settingsRepository.save(settings)
+    const newUser = await this.userRepository.getUserById(user.id)
+    newUser.settings = setting
+    await this.userRepository.save(newUser)
   }
 
   async findAll(filterUsersDto: FilterUsersDto) {

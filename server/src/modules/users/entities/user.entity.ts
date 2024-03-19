@@ -2,7 +2,6 @@ import { OrderProcess } from '../../orders/entities/order-process.entity'
 import { Order } from '../../orders/entities/order.entity'
 import { Supplier } from '../../supplier/entities/supplier.entity'
 import {
-  AfterInsert,
   Column,
   Entity,
   JoinColumn,
@@ -11,13 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { ProductReview } from '../../products/entities/product-review.entity'
-import {
-  Setting,
-  CURRENCY,
-  LANGUAGE,
-} from '../../settings/entities/settings.entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { SettingsRepository } from '../../settings/settings.repository'
+import { Setting } from '../../settings/entities/settings.entity'
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -28,10 +21,6 @@ export enum Role {
 
 @Entity()
 export class User {
-  constructor(
-    @InjectRepository(SettingsRepository)
-    private settingsRepository: SettingsRepository,
-  ) {}
   @PrimaryGeneratedColumn()
   id: number
 
@@ -64,7 +53,7 @@ export class User {
   @OneToMany(() => ProductReview, (rating) => rating.rater)
   ratings: ProductReview[]
 
-  @OneToOne(() => Setting, { cascade: true })
+  @OneToOne(() => Setting, (settings) => settings.user, { cascade: true })
   @JoinColumn()
   settings: Setting
 
@@ -73,19 +62,4 @@ export class User {
 
   @Column()
   password: string
-
-  // @AfterInsert()
-  // async createDefaultSettings() {
-  //   const settings = new Setting()
-  //   settings.user = this
-  //   settings.preferredCurrency = CURRENCY.FRW
-  //   settings.preferredLanguage = LANGUAGE.EN
-  //   settings.receiveOrderNotifications = true
-  //   settings.receiveReminderNotifications = true
-  //   settings.receiveOfferNotifications = true
-  //   settings.receiveFeedbackNotifications = true
-  //   settings.receiveUpdateNotifications = true
-  //
-  //   await this.settingsRepository.save(settings)
-  // }
 }
