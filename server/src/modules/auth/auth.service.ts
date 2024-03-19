@@ -39,6 +39,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials')
     }
+    if (!user?.password) {
+      throw new UnauthorizedException(
+        'Invalid credentials, seem to have google account',
+      )
+    }
     if (
       !(await this.bcryptService.compare(signInDto.password, user.password))
     ) {
@@ -52,7 +57,7 @@ export class AuthService {
   }
 
   async signUp(signUpto: SignUpDto) {
-    const user = await this.userRepository.getUserByEmail(signUpto.email)
+    let user = await this.userRepository.getUserByEmail(signUpto.email)
     if (user) {
       throw new ConflictException('User with the same Email already exists')
     }
@@ -61,10 +66,37 @@ export class AuthService {
       role: Role.CUSTOMER,
       password: await this.bcryptService.hash(signUpto.password),
     })
-    const newUser = await this.userRepository.save(userEntity)
+    user = await this.userRepository.save(userEntity)
+    await this.usersService.createDefaultSettings(user)
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userPublic } = newUser
+    const { password, ...userPublic } = user
     return userPublic
+  }
+
+  async googleLogin(req: any) {
+    const { email } = req.user
+
+    let user = await this.userRepository.getUserByEmail(email)
+
+    if (!user) {
+      const userEntity = this.userRepository.create({
+        email,
+        role: Role.CUSTOMER,
+        fullName: req.user.displayName,
+        tinNumber: '',
+        password: '',
+        telephone: '',
+      })
+      user = await this.userRepository.save(userEntity)
+      await this.usersService.createDefaultSettings(user)
+    }
+
+    const payload = { id: user.id, email: user.email, role: user.role }
+    return {
+      token: await this.jwtService.signAsync(payload, { expiresIn: '2d' }),
+      user,
+    }
   }
 
   async resetPassword(passwordResetDto: PasswordResetDto) {

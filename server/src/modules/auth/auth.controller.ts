@@ -2,10 +2,13 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
+  Req,
+  Request,
   UseGuards,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
@@ -24,13 +27,15 @@ import { Roles } from './roles/roles.decorator'
 import { Role } from '../users/entities/user.entity'
 import { AuthGuard } from './auth.guard'
 import { RolesGuard } from './roles/roles.guard'
+import { GoogleOAuthGuard } from './google-oauth.guard'
+import { CustomRequest } from './auth.constants'
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'User loogin' })
+  @ApiOperation({ summary: 'User login' })
   @Post('login')
   async signIn(@Body() signInDto: SignInDto) {
     const data = await this.authService.signIn(signInDto)
@@ -54,11 +59,11 @@ export class AuthController {
   }
 
   @Post('/update-password/:token')
-  updatetePassword(
+  updatePassword(
     @Param('token') token: string,
-    @Body() updatepasswordDto: UpdatepasswordDto,
+    @Body() updatePasswordDto: UpdatepasswordDto,
   ) {
-    return this.authService.updatePassword(token, updatepasswordDto)
+    return this.authService.updatePassword(token, updatePasswordDto)
   }
 
   @Roles(Role.ADMIN, Role.AGENT, Role.CUSTOMER, Role.DRIVER)
@@ -67,8 +72,18 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'password changed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
-  @Post('change-passwrd')
+  @Post('change-password')
   changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return this.authService.changePassword(changePasswordDto)
+  }
+
+  @Get('google')
+  @UseGuards(GoogleOAuthGuard)
+  async googleAuth(@Req() req: CustomRequest) {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleOAuthGuard)
+  googleAuthRedirect(@Req() req: CustomRequest) {
+    return this.authService.googleLogin(req)
   }
 }
