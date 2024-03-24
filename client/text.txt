@@ -1,0 +1,81 @@
+=====ADDRESSS
+
+====DROPDOWN THOSE SAVED BY ADMIN
+====AGENT ADDRESSES 
+
+
+
+ACCEPT NULL ON TIMEUSAGE
+CHANGE DISCOUNT CODE TO TITLE TOO COOL BRO
+OKAY BI
+
+
+jBD^^hs0
+
+
+
+{
+    "id": 17,
+    "orderItemId": 1,
+    "agentId": 10,
+    "processStatus": "ASSIGNED",
+    "orderItem": {
+        "id": 1,
+	"product":{
+	  "name":"screw-driver",
+	},
+        "quantity": 200,
+        "pricePerItem": 9000,
+        "order": {
+            "id": 1,
+            "orderId": "ORD-2024-00002",
+            "orderDate": "2024-02-28T20:28:38.405Z",
+            "total": 2370000,
+            "status": "PENDING"
+        }
+    }
+}
+
+
+
+
+
+1.On orderProcess add the product include the product inside so that I can know the name of the 
+Item assigned to the agent and be able to display it
+ 
+2.On orderProcess make sure that the order is in the first place and then nested inside I 
+Get to see the assigned items. For the moment I only the order process in terms of 
+Assigned items .... Which means I can have like 12 assignments from one order while the
+Order only has 2 items ... it should be that the order is in the first so that when 
+I assign multiple time the number of assigned items can not be more that the items on the
+Order 
+
+It should {order:number,processStatus:string, orderItems(or assignedItems):array of order
+Items assigned (including product names), order:order objects for getting details like 
+Dates and location, customer:for getting the info the customer just in case }
+
+
+
+
+{
+    "id": 17,
+    "orderItemId": 1,
+    "agentId": 10,
+    "processStatus": "ASSIGNED",
+    "orderItem": {
+        "id": 1,
+        "quantity": 200,
+        "pricePerItem": 9000,
+	
+        "order": {
+            "id": 1,
+            "orderId": "ORD-2024-00002",
+            "orderDate": "2024-02-28T20:28:38.405Z",
+            "total": 2370000,
+            "status": "PENDING"
+        }
+    }
+}
+
+
+Ikindi uze gufungura iriya patch yo gukora update kuri order status .... Nabonye iri commented
