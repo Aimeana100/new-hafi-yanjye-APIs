@@ -23,7 +23,7 @@ import { UpdateSettingsDto } from './dto/update-settings.dto'
 import { CURRENCY, LANGUAGE } from './entities/settings.entity'
 import { CreateDocumentDto } from './dto/create-document.dto'
 import { UpdateDocumentDto } from './dto/update-document.dto'
-import {documentType} from "./entities/document.entity";
+import { documentType } from './entities/document.entity'
 @ApiTags('settings')
 @Controller('settings')
 export class SettingsController {
@@ -49,7 +49,7 @@ export class SettingsController {
   @ApiBearerAuth()
   @Patch('document')
   updateDocument(
-    @Param('documentId') documentId: number,
+    @Param('documentId', ParseIntPipe) documentId: number,
     @Body() updateDocumentDto: UpdateDocumentDto,
   ) {
     return this.settingsService.updateDocument(documentId, updateDocumentDto)

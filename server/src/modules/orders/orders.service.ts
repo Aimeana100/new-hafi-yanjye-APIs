@@ -16,12 +16,14 @@ import { UserRepository } from '../users/user.repository'
 import { REQUEST } from '@nestjs/core'
 import { CustomRequest } from '../auth/auth.constants'
 import { Role } from '../users/entities/user.entity'
-import { In, Repository, SelectQueryBuilder } from 'typeorm'
-import { OrderProcess } from './entities/order-process.entity'
+import { ILike, In, Repository, SelectQueryBuilder } from 'typeorm'
+import { OrderProcess, ProcessStatuses } from './entities/order-process.entity'
 import { AssignOrderAgentDto } from './dto/asignOrderAgent.dto'
 import { SiteRepository } from '../site/site.repository'
 import { Site } from '../site/entities/site.entity'
 import { AssignOderRoDriverDto } from './dto/assign-oder-ro-driver.dto'
+import { contains } from 'class-validator'
+import { FilterOrderDto } from './dto/filter-order.dto'
 
 @Injectable()
 export class OrdersService {
@@ -148,13 +150,18 @@ export class OrdersService {
       where: { orderItemId: In(orderItems) },
     })
   }
-  async findAll(): Promise<
-    any[] | OrderDetails[] | Order[] | SelectQueryBuilder<Order>
-  > {
+  async findAll(
+    filterOrderDto: FilterOrderDto,
+  ): Promise<OrderDetails[] | Order[] | SelectQueryBuilder<Order>> {
     const { id: userId, role } = this.request.user
 
     if (role === Role.ADMIN) {
       return this.orderRepository.find({
+        where: {
+          ...(filterOrderDto.orderId && {
+            orderId: ILike(`%${filterOrderDto.orderId}%`),
+          }),
+        },
         relations: {
           customer: true,
           orderDetails: {
@@ -182,6 +189,9 @@ export class OrdersService {
           customer: {
             id: userId,
           },
+          ...(filterOrderDto.orderId && {
+            orderId: ILike(`%${filterOrderDto.orderId}%`),
+          }),
         },
         relations: {
           orderDetails: {
@@ -212,11 +222,15 @@ export class OrdersService {
               agentId: userId,
             },
           },
+          ...(filterOrderDto.orderId && {
+            orderId: ILike(`%${filterOrderDto.orderId}%`),
+          }),
         },
         relations: {
           customer: true,
           orderDetails: {
             product: true,
+            orderProcessor: true,
           },
           delivery_site: {
             sector: {
@@ -235,6 +249,9 @@ export class OrdersService {
           driver: {
             id: userId,
           },
+          ...(filterOrderDto.orderId && {
+            orderId: ILike(`%${filterOrderDto.orderId}%`),
+          }),
         },
         relations: {
           customer: true,
@@ -251,8 +268,6 @@ export class OrdersService {
         },
       })
     }
-
-    return []
   }
 
   findOne(id: number) {
@@ -369,7 +384,7 @@ export class OrdersService {
     return this.updateOrderStatus(id, OrderStatus.CONFIRMED)
   }
 
-  concelOrder(id: number) {
+  cancelOrder(id: number) {
     return this.updateOrderStatus(id, OrderStatus.CANCELED)
   }
 
@@ -423,11 +438,40 @@ export class OrdersService {
     })
   }
 
+  updateOrderItemInProcess(orderItemId: number) {
+    return this.updateOrderItemStatus(orderItemId, ProcessStatuses.INPROGRESS)
+  }
+
+  updateOrderItemDone(orderItemId: number) {
+    return this.updateOrderItemStatus(orderItemId, ProcessStatuses.DONE)
+  }
+
   private async updateOrderStatus(id: number, status: OrderStatus) {
     await this.orderRepository.findById(id)
     return this.orderRepository.update(id, { status })
   }
 
+  private async updateOrderItemStatus(
+    id: number,
+    processStatus: ProcessStatuses,
+  ) {
+    const currentUserId = this.request.user.id
+    const orderItem = await this.orderProcessRepository.findOne({
+      where: {
+        id,
+        agent: {
+          id: currentUserId,
+        },
+      },
+    })
+    if (!orderItem) {
+      throw new NotFoundException(
+        `Order Item with id ${id} not found or not assigned to you`,
+      )
+    }
+    await this.orderProcessRepository.update(id, { processStatus })
+    return this.orderProcessRepository.findOne({ where: { id } })
+  }
   remove(id: number) {
     return `This action removes a #${id} order`
   }
