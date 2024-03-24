@@ -117,7 +117,7 @@ export class SiteService {
     })
 
     const siteObj = { ...site, ...updateSiteDto, district, province, sector }
-    const siteEntity = await this.siteRepository.create(siteObj)
+    const siteEntity = this.siteRepository.create(siteObj)
     return this.siteRepository.update(id, siteEntity)
   }
 
@@ -152,7 +152,7 @@ export class DistrictService {
     private provinceRepository: ProvinceRepository,
   ) {}
   findAll() {
-    return this.districtRepository.find()
+    return this.districtRepository.find({ relations: { province: true } })
   }
   async findAllByProvince(id: number) {
     const province = await this.provinceRepository.findOne({
@@ -168,6 +168,9 @@ export class DistrictService {
         province: {
           id,
         },
+      },
+      relations: {
+        province: true,
       },
     })
   }
@@ -185,7 +188,9 @@ export class SectorService {
     private districtRepository: DistrictRepository,
   ) {}
   findAll() {
-    return this.sectorRepository.find()
+    return this.sectorRepository.find({
+      relations: { district: { province: true } },
+    })
   }
 
   async findAllByDistrict(id: number) {
@@ -197,6 +202,11 @@ export class SectorService {
       where: {
         district: {
           id,
+        },
+      },
+      relations: {
+        district: {
+          province: true,
         },
       },
     })

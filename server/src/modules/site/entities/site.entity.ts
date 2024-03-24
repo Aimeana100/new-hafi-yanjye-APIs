@@ -22,7 +22,7 @@ export class Site {
   @Column()
   description: string
 
-  @Column()
+  @Column({ default: 0 })
   deliveryFee: number
 
   @ManyToOne(() => Province, (province) => province.site)
