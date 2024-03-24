@@ -75,7 +75,7 @@ export class OrdersService {
       this.orderRepository.create(order),
     )
 
-    // trtansform orderDetatils
+    // transform orderDetails
     for (const orderItem of createOrderDto.order) {
       const orderDetails = new OrderDetails()
 
@@ -340,6 +340,7 @@ export class OrdersService {
           customer: true,
           orderDetails: {
             product: true,
+            orderProcessor: true,
           },
           delivery_site: {
             sector: {
@@ -363,6 +364,7 @@ export class OrdersService {
           customer: true,
           orderDetails: {
             product: true,
+            orderProcessor: true,
           },
           delivery_site: {
             sector: {
@@ -463,13 +465,34 @@ export class OrdersService {
           id: currentUserId,
         },
       },
+      relations: {
+        orderItem: { order: true },
+      },
     })
     if (!orderItem) {
       throw new NotFoundException(
         `Order Item with id ${id} not found or not assigned to you`,
       )
     }
+
     await this.orderProcessRepository.update(id, { processStatus })
+    const order = await this.orderRepository.findOne({
+      where: { id: orderItem.orderItem.order.id },
+      relations: {
+        orderDetails: { orderProcessor: true },
+      },
+    })
+    // check if all order items are done and mark order as complete
+    const isAllItemsDone = order.orderDetails.every(
+      (orderDetail) =>
+        orderDetail.orderProcessor.processStatus === ProcessStatuses.DONE,
+    )
+
+    if (isAllItemsDone) {
+      await this.orderRepository.update(order.id, {
+        status: OrderStatus.COMPLETED,
+      })
+    }
     return this.orderProcessRepository.findOne({ where: { id } })
   }
   remove(id: number) {
