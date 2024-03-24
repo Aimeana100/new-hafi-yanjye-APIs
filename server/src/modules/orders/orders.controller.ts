@@ -7,6 +7,7 @@ import {
   UseGuards,
   Patch,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common'
 import { OrdersService } from './orders.service'
 import { CreateOrderDto } from './dto/create-order.dto'
@@ -23,6 +24,7 @@ import { RolesGuard } from '../auth/roles/roles.guard'
 import { Roles } from '../auth/roles/roles.decorator'
 import { AssignOrderAgentDto } from './dto/asignOrderAgent.dto'
 import { AssignOderRoDriverDto } from './dto/assign-oder-ro-driver.dto'
+import { FilterOrderDto } from './dto/filter-order.dto'
 
 @ApiTags('orders')
 @Controller('orders')
@@ -41,17 +43,17 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto)
   }
 
-  @ApiOperation({ summary: 'all orders / authenticated route ' })
+  @ApiOperation({ summary: 'get all orders ' })
   @ApiResponse({ status: 200, description: 'All orders' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  @Roles(Role.CUSTOMER, Role.AGENT, Role.ADMIN)
+  @Roles(Role.CUSTOMER, Role.AGENT, Role.ADMIN, Role.DRIVER)
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Retrieve all orders' })
-  findAll() {
-    return this.ordersService.findAll()
+  findAll(@Query() filterOrdersDto: FilterOrderDto) {
+    return this.ordersService.findAll(filterOrdersDto)
   }
   @ApiOperation({ summary: 'Retrieve single order' })
   @ApiResponse({ status: 201, description: 'All Orders' })
@@ -102,7 +104,7 @@ export class OrdersController {
   }
 
   @ApiOperation({ summary: 'Cancel order ' })
-  @ApiResponse({ status: 201, description: ' order canseled' })
+  @ApiResponse({ status: 201, description: ' order canceled' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({ status: 403, description: 'Access Forbidden ' })
   @Roles(Role.ADMIN)
@@ -110,11 +112,11 @@ export class OrdersController {
   @ApiBearerAuth()
   @Patch('cancel/:id')
   cancelOrder(@Param('id') id: string) {
-    return this.ordersService.concelOrder(+id)
+    return this.ordersService.cancelOrder(+id)
   }
 
-  @ApiOperation({ summary: 'Confirm order ' })
-  @ApiResponse({ status: 201, description: ' order confirmed' })
+  @ApiOperation({ summary: 'Complete order ' })
+  @ApiResponse({ status: 201, description: ' order completed' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({ status: 403, description: 'Access Forbidden ' })
   @Roles(Role.ADMIN)
@@ -125,16 +127,42 @@ export class OrdersController {
     return this.ordersService.completeOrder(+id)
   }
 
-  @ApiOperation({ summary: 'Confirm order ' })
-  @ApiResponse({ status: 201, description: ' order confirmed' })
+  @ApiOperation({ summary: 'Put order in delivery ' })
+  @ApiResponse({ status: 201, description: ' order in delivery' })
   @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({ status: 403, description: 'Access Forbidden ' })
   @Roles(Role.DRIVER)
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Patch('complete/:id')
+  @Patch('deliver/:id')
   deliverOrder(@Param('id', ParseIntPipe) id: string) {
     return this.ordersService.deliverOrder(+id)
+  }
+
+  @ApiOperation({ summary: 'put order item in progress ' })
+  @ApiResponse({ status: 201, description: ' order item in progress' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Access Forbidden ' })
+  @Roles(Role.AGENT)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Patch('item/in-process/:orderItemId')
+  updateOrderInProcess(
+    @Param('orderItemId', ParseIntPipe) orderItemId: string,
+  ) {
+    return this.ordersService.updateOrderItemInProcess(+orderItemId)
+  }
+
+  @ApiOperation({ summary: 'complete order item processing' })
+  @ApiResponse({ status: 201, description: ' order item done' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({ status: 403, description: 'Access Forbidden ' })
+  @Roles(Role.AGENT)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Patch('item/done/:orderItemId')
+  updateOrderDone(@Param('orderItemId', ParseIntPipe) orderItemId: string) {
+    return this.ordersService.updateOrderItemDone(+orderItemId)
   }
 
   // @Patch(':id')
