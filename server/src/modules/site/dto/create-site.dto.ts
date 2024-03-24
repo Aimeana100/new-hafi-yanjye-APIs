@@ -18,12 +18,7 @@ export class CreateSiteDto {
 
   @IsOptional()
   @IsNumber()
-  province: number
-
-  @IsNotEmpty()
-  @IsNumber()
-  @IsOptional()
-  district: number
+  deliveryFee: number
 
   @IsNotEmpty()
   @IsNumber()

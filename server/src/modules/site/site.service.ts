@@ -48,7 +48,9 @@ export class SiteService {
   }
 
   findAll() {
-    return this.siteRepository.find()
+    return this.siteRepository.find({
+      relations: { sector: { district: { province: true } } },
+    })
   }
 
   findOne(id: number) {

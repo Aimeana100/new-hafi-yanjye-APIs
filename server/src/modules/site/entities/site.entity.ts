@@ -22,6 +22,9 @@ export class Site {
   @Column()
   description: string
 
+  @Column()
+  deliveryFee: number
+
   @ManyToOne(() => Province, (province) => province.site)
   province: Province
 
