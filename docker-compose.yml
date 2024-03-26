@@ -1,17 +1,58 @@
-version: '3'
-
+version: "3.9"
 services:
   postgres:
-    image: postgres:latest
+    image: "postgres:16-alpine"
+    restart: always
     environment:
-      POSTGRES_USER: your_postgres_user
-      POSTGRES_PASSWORD: your_postgres_password
-      POSTGRES_DB: your_database_name
-    ports:
-      - "5432:5432"
+      - POSTGRES_PASSWORD=postgres_password
     networks:
       - app-network
-
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: "./server"
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+    networks:
+      - app-network
+  client:
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile
+      context: ./client
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    volumes:
+      - /app/node_modules
+      - ./client:/app
 networks:
   app-network:
     driver: bridge
+

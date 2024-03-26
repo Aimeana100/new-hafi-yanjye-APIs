@@ -1,0 +1,38 @@
+@font-face {
+	font-family: "Nunito";
+	src: url("./Nunito-Bold.woff") format("woff");
+	font-weight: 800;
+	font-style: bold;
+}
+
+@font-face {
+	font-family: "Nunito";
+	src: url("./Nunito-Regular.woff") format("woff");
+	font-weight: 400;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Nunito";
+	src: url("./Nunito-Light.woff") format("woff");
+	font-weight: 300;
+	font-style: light;
+}
+@font-face {
+	font-family: "Nunito";
+	src: url("./Nunito-Medium.woff") format("woff");
+	font-weight: 500;
+	font-style: medium;
+}
+@font-face {
+	font-family: "Nunito";
+	src: url("./Nunito-ExtraLight.woff") format("woff");
+	font-weight: 200;
+	font-style: light;
+}
+
+@font-face {
+	font-family: "loginDes";
+	src: url("./GentiumBookPlus-Regular.woff") format("woff");
+	font-weight: 400;
+	font-style: normal;
+}
