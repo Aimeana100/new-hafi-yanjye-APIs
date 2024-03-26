@@ -2,7 +2,7 @@ import { OrderProcess } from '../../orders/entities/order-process.entity'
 import { Order } from '../../orders/entities/order.entity'
 import { Supplier } from '../../supplier/entities/supplier.entity'
 import {
-  Column,
+  Column, CreateDateColumn, DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
@@ -62,4 +62,10 @@ export class User {
 
   @Column()
   password: string
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @DeleteDateColumn()
+  deletedAt: Date
 }

@@ -23,6 +23,7 @@ services:
     build:
       dockerfile: Dockerfile.dev
       context: "./server"
+    container_name: api:latest
     restart: always
     ports:
       - "5000:5000"
